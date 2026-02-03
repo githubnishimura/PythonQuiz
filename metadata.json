@@ -1,0 +1,5 @@
+{
+  "name": "SmartQuiz Pro - CSV Quiz Master",
+  "description": "A professional quiz application that allows users to upload CSV-based questions, take randomized 40-question quizzes, and receive detailed feedback with explanatory memos for incorrect answers.",
+  "requestFramePermissions": []
+}
