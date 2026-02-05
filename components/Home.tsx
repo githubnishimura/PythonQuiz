@@ -19,9 +19,9 @@ const Home: React.FC<HomeProps> = ({ onStartDefault, onGoToUpload }) => {
             <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mb-4 backdrop-blur-sm border border-white/30">
               <i className="fas fa-brain text-4xl text-white"></i>
             </div>
-            <h2 className="text-3xl font-extrabold mb-2 text-center">クイズマスターへようこそ</h2>
+            <h2 className="text-3xl font-extrabold mb-2 text-center">Pythonクイズへようこそ</h2>
             <p className="text-indigo-100 text-center max-w-md">
-              学習の成果を試しましょう。内蔵の40問クイズ、または自分で作成したCSVファイルから開始できます。
+              学習の成果を試しましょう。AIが作成した40問、または自分で作成したCSVファイルから開始できます。
             </p>
           </div>
         </div>
@@ -34,9 +34,9 @@ const Home: React.FC<HomeProps> = ({ onStartDefault, onGoToUpload }) => {
             <div className="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <i className="fas fa-play"></i>
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">標準クイズを開始</h3>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">AI作成問題を開始</h3>
             <p className="text-slate-500 text-sm leading-relaxed">
-              あらかじめ用意された40問のクイズに挑戦します。問題順・選択肢順は毎回ランダムです。
+              あらかじめ用意された40問に挑戦します。問題順・選択肢順は毎回ランダムです。
             </p>
           </button>
 
