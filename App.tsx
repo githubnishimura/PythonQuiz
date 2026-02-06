@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { AppState, Question, UserAnswer } from './types';
 import Home from './components/Home';
@@ -113,7 +112,7 @@ const App: React.FC = () => {
             <div className="bg-indigo-600 p-2 rounded-lg group-hover:bg-indigo-700 transition-colors">
               <i className="fas fa-graduation-cap text-white"></i>
             </div>
-            <h1 className="text-xl font-bold text-slate-800 tracking-tight">SmartQuiz Pro</h1>
+            <h1 className="text-xl font-bold text-slate-800 tracking-tight">Senju Soft</h1>
           </button>
           {currentState !== AppState.HOME && (
             <button 
@@ -129,7 +128,7 @@ const App: React.FC = () => {
       {/* 印刷用ヘッダー */}
       <div className="print-only p-8 border-b-4 border-slate-800 mb-8 bg-white">
         <h1 className="text-4xl font-black text-slate-900">クイズ学習 実施結果レポート</h1>
-        <p className="text-slate-500 mt-2 font-bold">SmartQuiz Pro - システム生成ドキュメント</p>
+        <p className="text-slate-500 mt-2 font-bold">Senju Soft - システム生成ドキュメント</p>
         <p className="text-slate-400 text-sm">生成日時: {new Date().toLocaleString('ja-JP', { dateStyle: 'long', timeStyle: 'medium' })}</p>
       </div>
 
@@ -160,7 +159,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="py-8 border-t border-slate-200 text-center text-slate-400 text-sm no-print">
-        &copy; 2026 SmartQuiz Pro - Professional Quiz Learning Tool
+        &copy; 2026 Senju Soft - Python Learning Tool
       </footer>
     </div>
   );
