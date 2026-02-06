@@ -1,9 +1,9 @@
 
 import React, { useState, useRef } from 'react';
-import { Question, UserAnswer } from '../types';
+import { UserAnswer } from '../types';
 
 interface ResultsProps {
-  questions: Question[];
+  questions: any[];
   userAnswers: UserAnswer[];
   totalTime: number;
   onRetry: () => void;
@@ -25,11 +25,8 @@ const Results: React.FC<ResultsProps> = ({ userAnswers, totalTime, onRetry }) =>
   const handleDownloadPDF = async () => {
     if (!resultsRef.current) return;
     
-    // グローバルなhtml2pdf関数を取得
     const html2pdf = (window as any).html2pdf;
-
     if (!html2pdf) {
-      console.warn('html2pdf library not loaded. Falling back to native print.');
       handleNativePrint();
       return;
     }
@@ -38,7 +35,7 @@ const Results: React.FC<ResultsProps> = ({ userAnswers, totalTime, onRetry }) =>
     
     const element = resultsRef.current;
     const opt = {
-      margin: [15, 10, 15, 10],
+      margin: [10, 10, 10, 10],
       filename: `QuizResult_${new Date().toISOString().slice(0, 10)}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
@@ -52,7 +49,6 @@ const Results: React.FC<ResultsProps> = ({ userAnswers, totalTime, onRetry }) =>
     };
 
     try {
-      // ライブラリの実行
       await html2pdf().set(opt).from(element).save();
     } catch (error) {
       console.error('PDF生成エラー:', error);
@@ -70,9 +66,7 @@ const Results: React.FC<ResultsProps> = ({ userAnswers, totalTime, onRetry }) =>
   return (
     <div className="max-w-3xl mx-auto pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       
-      {/* 印刷・PDF生成の対象エリア */}
       <div ref={resultsRef} className="pdf-content p-4 sm:p-0">
-        {/* PDF専用ヘッダー（通常時は非表示、印刷/PDF時は表示） */}
         <div className="hidden print:block mb-8 border-b-2 border-slate-200 pb-4">
           <h1 className="text-2xl font-bold text-slate-800">クイズ学習結果レポート</h1>
           <p className="text-slate-500 text-sm">生成日: {new Date().toLocaleDateString('ja-JP')}</p>
@@ -108,46 +102,50 @@ const Results: React.FC<ResultsProps> = ({ userAnswers, totalTime, onRetry }) =>
               <p className="text-slate-500">表示するデータがありません。</p>
             </div>
           ) : (
-            filteredAnswers.map((ans, idx) => (
-              <div key={idx} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden break-inside-avoid page-break-inside-avoid">
-                <div className="p-6">
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <h4 className="font-bold text-slate-800 leading-relaxed text-base sm:text-lg">
-                      <span className="text-indigo-600 mr-2 font-black">Q{idx + 1}.</span>
-                      {ans.question.text}
-                    </h4>
-                    <div className={`shrink-0 px-3 py-1 rounded-full text-[10px] font-black border ${
-                      ans.isCorrect ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
-                    }`}>
-                      {ans.isCorrect ? 'OK' : 'MISS'}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                    <div className={`p-3 rounded-lg border ${ans.isCorrect ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
-                      <p className="text-[9px] font-bold text-slate-400 mb-1 uppercase">あなたの回答</p>
-                      <p className="text-sm font-bold">{ans.question.choices[ans.selectedIndex]}</p>
-                    </div>
-                    {!ans.isCorrect && (
-                      <div className="p-3 bg-green-50 border border-green-100 rounded-lg">
-                        <p className="text-[9px] font-bold text-green-600 mb-1 uppercase">正しい答え</p>
-                        <p className="text-sm font-bold text-green-800">{ans.question.choices[ans.question.correctIndex]}</p>
+            filteredAnswers.map((ans, idx) => {
+              const isCodeQuestion = ans.question.text.includes('\n');
+              return (
+                <div key={idx} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden break-inside-avoid page-break-inside-avoid">
+                  <div className="p-6">
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                      <div className="flex-grow">
+                        <span className="text-indigo-600 mr-2 font-black">Q{idx + 1}.</span>
+                        <div className={`mt-2 p-4 whitespace-pre-wrap leading-relaxed ${isCodeQuestion ? 'font-mono text-sm bg-slate-800 text-slate-100 rounded-lg' : 'font-bold text-slate-800 text-base sm:text-lg'}`}>
+                          {ans.question.text}
+                        </div>
                       </div>
-                    )}
-                  </div>
+                      <div className={`shrink-0 px-3 py-1 rounded-full text-[10px] font-black border ${
+                        ans.isCorrect ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
+                      }`}>
+                        {ans.isCorrect ? 'OK' : 'MISS'}
+                      </div>
+                    </div>
 
-                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                    <p className="text-[9px] font-bold text-slate-400 mb-1 uppercase">解説メモ</p>
-                    <p className="text-xs text-slate-600 leading-relaxed">{ans.question.memo || 'メモはありません。'}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                      <div className={`p-3 rounded-lg border ${ans.isCorrect ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
+                        <p className="text-[9px] font-bold text-slate-400 mb-1 uppercase">あなたの回答</p>
+                        <p className="text-sm font-bold">{ans.question.choices[ans.selectedIndex]}</p>
+                      </div>
+                      {!ans.isCorrect && (
+                        <div className="p-3 bg-green-50 border border-green-100 rounded-lg">
+                          <p className="text-[9px] font-bold text-green-600 mb-1 uppercase">正しい答え</p>
+                          <p className="text-sm font-bold text-green-800">{ans.question.choices[ans.question.correctIndex]}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                      <p className="text-[9px] font-bold text-slate-400 mb-1 uppercase">解説メモ</p>
+                      <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">{ans.question.memo || 'メモはありません。'}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
 
-      {/* 操作ボタン（印刷・PDF時は非表示） */}
       <div className="mt-8 flex flex-col items-center gap-6 no-print">
         <div className="flex flex-wrap justify-center gap-3">
           <button 

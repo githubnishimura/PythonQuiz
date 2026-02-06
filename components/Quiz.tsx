@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Question, UserAnswer } from '../types';
 
 interface QuizProps {
@@ -36,10 +36,13 @@ const Quiz: React.FC<QuizProps> = ({ questions, onFinish }) => {
     }
   }, [currentIndex, questions, selectedOption, answers, currentQuestion, onFinish]);
 
+  // 改行が含まれている場合はコードとみなし、デザインを調整
+  const isCodeQuestion = currentQuestion.text.includes('\n');
+
   return (
     <div className="max-w-2xl mx-auto">
       {/* Progress Bar */}
-      <div className="mb-8">
+      <div className="mb-8 no-print">
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-semibold text-slate-500">
             問題 {currentIndex + 1} / {questions.length}
@@ -55,12 +58,14 @@ const Quiz: React.FC<QuizProps> = ({ questions, onFinish }) => {
       </div>
 
       {/* Question Card */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-8 mb-6">
-        <h3 className="text-xl font-bold text-slate-800 mb-8 leading-relaxed">
-          {currentQuestion.text}
-        </h3>
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden mb-6">
+        <div className={`p-8 ${isCodeQuestion ? 'bg-slate-50/50' : 'bg-white'}`}>
+          <h3 className={`text-xl font-bold text-slate-800 leading-relaxed whitespace-pre-wrap ${isCodeQuestion ? 'font-mono text-base bg-slate-800 text-slate-100 p-6 rounded-xl shadow-inner' : ''}`}>
+            {currentQuestion.text}
+          </h3>
+        </div>
 
-        <div className="space-y-4">
+        <div className="p-8 pt-0 space-y-4">
           {currentQuestion.choices.map((choice, idx) => (
             <button
               key={idx}
@@ -71,7 +76,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onFinish }) => {
                   : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
               }`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold border-2 ${
+              <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center font-bold border-2 ${
                 selectedOption === idx ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-400 border-slate-200'
               }`}>
                 {String.fromCharCode(65 + idx)}
@@ -83,11 +88,11 @@ const Quiz: React.FC<QuizProps> = ({ questions, onFinish }) => {
       </div>
 
       {/* Action Area */}
-      <div className="flex justify-end">
+      <div className="flex justify-end no-print">
         <button
           onClick={handleNext}
           disabled={selectedOption === null}
-          className={`px-10 py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center gap-2 ${
+          className={`px-10 py-4 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center gap-2 border-none cursor-pointer ${
             selectedOption === null
               ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none'
               : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:-translate-y-1 active:translate-y-0'
