@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Question } from '../types';
 
@@ -11,21 +10,24 @@ const Uploader: React.FC<UploaderProps> = ({ onCsvLoaded, onBack }) => {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 堅牢なCSVパーサー: クォート内の改行やエスケープされたクォートに対応
+  // 改良された堅牢なCSVパーサー: クォート内の改行を維持し、エスケープされた二重クォートを処理
   const parseCSV = (csvText: string): Question[] => {
     const result: string[][] = [];
     let row: string[] = [];
     let field = '';
     let inQuotes = false;
 
-    for (let i = 0; i < csvText.length; i++) {
-      const char = csvText[i];
-      const nextChar = csvText[i + 1];
+    // BOMの除去
+    const cleanText = csvText.startsWith('\uFEFF') ? csvText.slice(1) : csvText;
+
+    for (let i = 0; i < cleanText.length; i++) {
+      const char = cleanText[i];
+      const nextChar = cleanText[i + 1];
 
       if (inQuotes) {
         if (char === '"' && nextChar === '"') {
           field += '"';
-          i++; // 二重クォートをスキップ
+          i++; // 二重クォートのエスケープをスキップ
         } else if (char === '"') {
           inQuotes = false;
         } else {
@@ -45,20 +47,30 @@ const Uploader: React.FC<UploaderProps> = ({ onCsvLoaded, onBack }) => {
           }
           row = [];
           field = '';
+        } else if (char === '\r') {
+          // 単独の \r も行末として扱う（古い環境用）
+          row.push(field.trim());
+          if (row.length > 0 && row.some(f => f !== '')) {
+            result.push(row);
+          }
+          row = [];
+          field = '';
         } else {
           field += char;
         }
       }
     }
-    // 最後のフィールドと行を処理
+    // 最後の行の処理
     if (field || row.length > 0) {
       row.push(field.trim());
-      result.push(row);
+      if (row.some(f => f !== '')) {
+        result.push(row);
+      }
     }
 
     return result.map((parts, index) => {
       if (parts.length < 7) {
-        throw new Error(`行 ${index + 1} の形式が正しくありません。カラムが不足しています（現在 ${parts.length} カラム）。`);
+        throw new Error(`行 ${index + 1} の形式が正しくありません。カラムが不足しています（現在 ${parts.length} カラム）。必要カラム数: 7`);
       }
       return {
         id: `q-csv-${index}-${Date.now()}`,
@@ -86,10 +98,10 @@ const Uploader: React.FC<UploaderProps> = ({ onCsvLoaded, onBack }) => {
         onCsvLoaded(questions);
       } catch (err: any) {
         console.error(err);
-        setError(err.message || 'ファイルの読み込みに失敗しました。');
+        setError(err.message || 'ファイルの読み込みに失敗しました。形式を確認してください。');
       }
     };
-    reader.readAsText(file);
+    reader.readAsText(file, 'UTF-8');
   };
 
   const generateSampleData = () => {
@@ -158,7 +170,7 @@ elif x < 50:
         <div className="mt-8 pt-8 border-t border-slate-100 text-left">
           <h3 className="font-semibold text-slate-700 mb-3 text-sm">推奨形式:</h3>
           <p className="text-[10px] text-slate-400 mb-4 bg-slate-50 p-3 rounded font-mono break-all leading-relaxed">
-            "問題文(改行可)", 選択肢1, 選択肢2, 選択肢3, 選択肢4, 正解Index, 解説メモ
+            "問題文(改行可)", "選択肢1(改行可)", "選択肢2", "選択肢3", "選択肢4", 正解Index, 解説メモ
           </p>
           <button 
             onClick={generateSampleData}

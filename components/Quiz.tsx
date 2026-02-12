@@ -70,7 +70,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onFinish }) => {
             <button
               key={idx}
               onClick={() => setSelectedOption(idx)}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${
+              className={`w-full text-left p-4 h-auto min-h-[4rem] rounded-xl border-2 transition-all flex items-center gap-4 ${
                 selectedOption === idx
                   ? 'border-indigo-600 bg-indigo-50 text-indigo-900 shadow-md'
                   : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
@@ -81,7 +81,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onFinish }) => {
               }`}>
                 {String.fromCharCode(65 + idx)}
               </div>
-              <span className="font-medium text-lg">{choice}</span>
+              <span className="font-medium text-lg whitespace-pre-wrap leading-tight py-1">{choice}</span>
             </button>
           ))}
         </div>
